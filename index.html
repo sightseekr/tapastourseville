@@ -102,7 +102,7 @@ button:hover {
   margin-top: 10px;
     }
     #content { display: none; } /* hides the map until password is correct */
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%, height: 100%; }
     .mapboxgl-popup-content {
       background-color: rgba(255, 255, 255, 1) !important;
       border-radius: 6px;
@@ -141,15 +141,16 @@ button:hover {
     .custom-popup .directions-btn:hover {
       background-color: #a34b10;
     }
-    #search-container {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      width: 90%;
-      max-width: 400px;
-    }
+   #search-container {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;  /*  This makes it show ABOVE the map */
+  width: 90%;
+  max-width: 400px;
+  pointer-events: auto; /* ensure input can be tapped */
+}
     #search {
       width: 100%;
       padding: 8px 12px;
