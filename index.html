@@ -179,7 +179,7 @@ button:hover {
       color: #666;
       font-style: italic;
     }
-/* MOBILE-SPECIFIC ADJUSTMENTS */
+/* BULLETPROOF MOBILE FIX */
 @media (max-width: 768px) {
   html, body {
     height: 100%;
@@ -188,23 +188,30 @@ button:hover {
     overflow: hidden;
   }
 
-  #content, #map {
+  #content {
+    position: relative;
     height: 100%;
     width: 100%;
-    position: relative; /* relative positioning avoids collapse on mobile */
+  }
+
+  #map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100% !important;
+    width: 100% !important;
   }
 
   #search-container {
-    top: 10px;
-    width: 90%;
+    position: absolute;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10; /* ensure it appears on top of the map */
-  }
-
-  #search {
-    font-size: 0.95em;
-    padding: 6px 10px;
+    width: 92%;
+    max-width: 420px;
+    z-index: 999999 !important; /* Always on top */
+    display: block !important; /* Force visibility */
+    opacity: 1 !important; /* Just in case */
   }
 }
 
@@ -537,7 +544,19 @@ if (nextPub) {
     }
   });
 
-  map.on('load', () => {
+ map.on('load', () => {
+  // Force search bar to reattach on top of everything after map initializes
+  const searchContainer = document.getElementById('search-container');
+  document.body.appendChild(searchContainer);
+
+  // Extra insurance: slight delay, then force visibility and reflow
+  setTimeout(() => {
+    searchContainer.style.display = 'block';
+    searchContainer.style.opacity = '1';
+    searchContainer.style.zIndex = '9999';
+    map.resize();
+  }, 200);
+});
     const popupLayers = ['newsevilletapas-8rawhb'];
     const nonpopupLayers = ['route-1-1-ci9ak6', 'tapasstartpoint-accblf'];
     const layerToSourceLayer = {
