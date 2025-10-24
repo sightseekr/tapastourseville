@@ -545,18 +545,22 @@ if (nextPub) {
   });
 
  map.on('load', () => {
+   (function ensureSearchOnTop() {
   // Force search bar to reattach on top of everything after map initializes
   const searchContainer = document.getElementById('search-container');
-  document.body.appendChild(searchContainer);
-
+      if (!searchContainer) return;
+    // Put it as a direct child of body so it avoids being clipped by map canvas stacking contexts
+    if (searchContainer.parentElement !== document.body) {
+      document.body.appendChild(searchContainer);
+    searchContainer.style.position = searchContainer.style.position || 'absolute';
+    searchContainer.style.zIndex = '9999';
+    searchContainer.style.display = 'block';
   // Extra insurance: slight delay, then force visibility and reflow
   setTimeout(() => {
-    searchContainer.style.display = 'block';
-    searchContainer.style.opacity = '1';
-    searchContainer.style.zIndex = '9999';
-    map.resize();
-  }, 200);
-});
+   searchContainer.style.opacity = '1';
+      try { map.resize(); } catch (e) { /* ignore if map not ready */ }
+    }, 200);
+  })();
     const popupLayers = ['newsevilletapas-8rawhb'];
     const nonpopupLayers = ['route-1-1-ci9ak6', 'tapasstartpoint-accblf'];
     const layerToSourceLayer = {
