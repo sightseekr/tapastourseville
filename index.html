@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -101,7 +102,10 @@ button:hover {
   font-style: italic;
   margin-top: 10px;
     }
-    #content { display: none; } /* hides the map until password is correct */
+#content {
+  display: none;
+  flex-direction: column;
+} /* hides the map until password is correct */
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
     .mapboxgl-popup-content {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -141,7 +145,7 @@ button:hover {
     .custom-popup .directions-btn:hover {
       background-color: #a34b10;
     }
-    #content #search-container {
+    #search-container {
       position: absolute;
       top: 10px;
       left: 50%;
@@ -179,7 +183,7 @@ button:hover {
       color: #666;
       font-style: italic;
     }
-/* BULLETPROOF MOBILE FIX */
+/* MOBILE-SPECIFIC ADJUSTMENTS */
 @media (max-width: 768px) {
   html, body {
     height: 100%;
@@ -187,31 +191,24 @@ button:hover {
     padding: 0;
     overflow: hidden;
   }
-
-  #content {
-    position: relative;
+  
+  #content, #map {
     height: 100%;
     width: 100%;
+    position: relative; /* relative positioning avoids collapse on mobile */
   }
 
-  #map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  #content #search-container {
-    position: absolute;
-    top: 12px;
+  #search-container {
+    top: 10px;
+    width: 90%;
     left: 50%;
     transform: translateX(-50%);
-    width: 92%;
-    max-width: 420px;
-    z-index: 999999 !important; /* Always on top */
-    display: block !important; /* Force visibility */
-    opacity: 1 !important; /* Just in case */
+    z-index: 10; /* ensure it appears on top of the map */
+  }
+
+  #search {
+    font-size: 0.95em;
+    padding: 6px 10px;
   }
 }
 
@@ -234,7 +231,7 @@ button:hover {
 </div>
 <div id="content">
 <div id="map"></div>
-<div id="search-container" style="display:none;">
+<div id="search-container">
   <input type="text" id="search" placeholder="Find your next stop..." />
   <div id="suggestions"></div>
 </div>
@@ -248,9 +245,7 @@ function checkPassword(event) {
   if (input === CORRECT_PASSWORD) {
     // Hide login, show map
     document.getElementById("login").style.display = "none";
-    // Reveal the search bar now that the map is active
-    document.getElementById("search-container").style.display = "block";
-    document.getElementById("content").style.display = "block";
+    document.getElementById("content").style.display = "flex";
 
     // Reset body styles for full-screen map (DO NOT change display)
     document.body.style.background = "none";
@@ -546,37 +541,7 @@ if (nextPub) {
     }
   });
 
-map.on('load', () => {
-  function ensureSearchOnTop() {
-    const searchContainer = document.getElementById('search-container');
-    if (!searchContainer) return;
-
-    // Ensure it's on top
-    if (searchContainer.parentElement !== document.body) {
-      document.body.appendChild(searchContainer);
-    }
-
-    Object.assign(searchContainer.style, {
-      position: 'absolute',
-      top: '12px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'block',
-      opacity: '1',
-      zIndex: '999999'
-    });
-
-    // Force reflow to guarantee mobile visibility
-    setTimeout(() => {
-      if (typeof map.resize === 'function') {
-        map.resize();
-      }
-    }, 200);
-  }
-
-  // Call immediately and again after delay (covers iOS render lag)
-  ensureSearchOnTop();
-  setTimeout(ensureSearchOnTop, 600);
+  map.on('load', () => {
     const popupLayers = ['newsevilletapas-8rawhb'];
     const nonpopupLayers = ['route-1-1-ci9ak6', 'tapasstartpoint-accblf'];
     const layerToSourceLayer = {
@@ -674,7 +639,3 @@ if (!isMobile()) {
         popupOpenedByClick = false;
       }
     });
-  });
-</script>
-</body>
-</html> 
