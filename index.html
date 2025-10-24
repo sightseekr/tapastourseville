@@ -8,7 +8,100 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <style>
-    body { margin: 0; padding: 0; font-family: sans-serif; }
+   @import url('https://fonts.googleapis.com/css2?family=Avenir:wght@300;400&family=Brandon+Grotesque:wght@400;700&display=swap');
+
+/* Background */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Avenir', sans-serif;
+  background: linear-gradient(180deg, #FFFEFC, #FADBD8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #444454;
+}
+
+/* Login Container */
+.login-container {
+  text-align: center;
+  background: #FFFEFC;
+  padding: 30px 30px;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  max-width: 420px;
+  width: 90%;
+}
+
+/* Logo */
+.login-logo {
+  width: 100%;
+  max-width: 370px;
+  height: auto;
+  margin-bottom: 0px;
+}
+
+/* Title */
+.login-container h2 {
+  font-family: 'Brandon Grotesque', sans-serif;
+  font-size: 1.8em;
+  margin-bottom: 10px;
+  color: #444454;
+}
+
+/* Subtitle */
+.login-subtitle {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* Input Field */
+#password {
+  width: 100%;
+  padding: 14px 18px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid #F5B9B4;
+  background-color: #FFFEFC;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#password:focus {
+  border-color: #EA736B;
+}
+
+/* Button */
+button {
+  background-color: #EA736B;
+  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: 'Avenir', sans-serif;
+  font-weight: bold;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #EF968F;
+  transform: scale(1.03);
+}
+
+/* Error Message */
+#error {
+  color: #EA736B;
+  font-style: italic;
+  margin-top: 10px;
+    }
+    #content { display: none; } /* hides the map until password is correct */
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
     .mapboxgl-popup-content {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -89,12 +182,49 @@
   </style>
 </head>
 <body>
+    <div id="login" class="login-container">
+  <img 
+  src="https://static.wixstatic.com/media/eb9535_9d1043c625be4e6882a9bc0ad92f3463~mv2.png/v1/crop/x_0,y_598,w_1500,h_338/fill/w_1200,h_270,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/MTM%20Thin%20Pink.png" 
+  alt="Sightseekr Logo" 
+  class="login-logo" 
+/>
+  <h2>Welcome, explorer!</h2>
+  <p class="login-subtitle">This map is password protected</p>
+  <form id="login-form" onsubmit="checkPassword(event)">
+  <input type="password" id="password" placeholder="Enter password" />
+  <button type="submit">Enter</button>
+</form>
+  <p id="error" style="display: none;">Incorrect password</p>
+</div>
+<div id="content">
 <div id="map"></div>
 <div id="search-container">
   <input type="text" id="search" placeholder="Find your next stop..." />
   <div id="suggestions"></div>
 </div>
+</div>
+<script>
+  const CORRECT_PASSWORD = "SightseekrSeville2025"; // <-- change this to your chosen password
 
+function checkPassword(event) {
+  event.preventDefault();
+  const input = document.getElementById("password").value;
+  if (input === CORRECT_PASSWORD) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    // Reset body styles for full-screen map
+    document.body.style.display = "block";
+    document.body.style.background = "none";
+    document.body.style.height = "100vh";
+    document.body.style.overflow = "hidden";
+
+    map.resize(); 
+  } else {
+    document.getElementById("error").style.display = "block";
+  }
+}
+</script>
 <script>
   mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
 
@@ -102,7 +232,7 @@
     container: 'map',
     style: 'mapbox://styles/sightseekr/cmh0zwh7100bk01sadvlz9u38',
     center: [-5.995508, 37.383727], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-    zoom: 14.6
+    zoom: 13.6
   });
 
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
