@@ -544,23 +544,37 @@ if (nextPub) {
     }
   });
 
- map.on('load', () => {
-   (function ensureSearchOnTop() {
-  // Force search bar to reattach on top of everything after map initializes
-  const searchContainer = document.getElementById('search-container');
-      if (!searchContainer) return;
-    // Put it as a direct child of body so it avoids being clipped by map canvas stacking contexts
+map.on('load', () => {
+  function ensureSearchOnTop() {
+    const searchContainer = document.getElementById('search-container');
+    if (!searchContainer) return;
+
+    // Ensure it's on top
     if (searchContainer.parentElement !== document.body) {
       document.body.appendChild(searchContainer);
-    searchContainer.style.position = searchContainer.style.position || 'absolute';
-    searchContainer.style.zIndex = '9999';
-    searchContainer.style.display = 'block';
-  // Extra insurance: slight delay, then force visibility and reflow
-  setTimeout(() => {
-   searchContainer.style.opacity = '1';
-      try { map.resize(); } catch (e) { /* ignore if map not ready */ }
+    }
+
+    Object.assign(searchContainer.style, {
+      position: 'absolute',
+      top: '12px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      display: 'block',
+      opacity: '1',
+      zIndex: '999999'
+    });
+
+    // Force reflow to guarantee mobile visibility
+    setTimeout(() => {
+      if (typeof map.resize === 'function') {
+        map.resize();
+      }
     }, 200);
-  })();
+  }
+
+  // Call immediately and again after delay (covers iOS render lag)
+  ensureSearchOnTop();
+  setTimeout(ensureSearchOnTop, 600);
     const popupLayers = ['newsevilletapas-8rawhb'];
     const nonpopupLayers = ['route-1-1-ci9ak6', 'tapasstartpoint-accblf'];
     const layerToSourceLayer = {
