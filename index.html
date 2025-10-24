@@ -179,6 +179,29 @@ button:hover {
       color: #666;
       font-style: italic;
     }
+    /* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  html, body, #content, #map {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #search-container {
+    top: 5px;
+    width: 95%;
+    max-width: none;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #search {
+    font-size: 0.95em;
+    padding: 6px 10px;
+  }
+}
   </style>
 </head>
 <body>
@@ -210,6 +233,7 @@ function checkPassword(event) {
   event.preventDefault();
   const input = document.getElementById("password").value;
   if (input === CORRECT_PASSWORD) {
+    // Hide login, show map
     document.getElementById("login").style.display = "none";
     document.getElementById("content").style.display = "block";
 
@@ -219,7 +243,15 @@ function checkPassword(event) {
     document.body.style.height = "100vh";
     document.body.style.overflow = "hidden";
 
-    map.resize(); 
+    // Force Mapbox to recalc container size
+    map.resize();
+
+    // --- MOBILE-SPECIFIC RESIZE ---
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      setTimeout(() => {
+        map.resize(); // ensures map fills mobile screen after layout adjustments
+      }, 200);
+    }
   } else {
     document.getElementById("error").style.display = "block";
   }
