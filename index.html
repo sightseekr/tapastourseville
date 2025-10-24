@@ -214,11 +214,13 @@ function checkPassword(event) {
     document.getElementById("login").style.display = "none";
     document.getElementById("content").style.display = "block";
 
-    // Reset body styles for full-screen map
-    document.body.style.display = "block";
-    document.body.style.background = "none";
-    document.body.style.height = "100vh";
-    document.body.style.overflow = "hidden";
+document.body.style.margin = "0";
+document.body.style.padding = "0";
+document.body.style.display = "block";    // already there
+document.body.style.height = "100vh";     // full screen
+document.body.style.overflow = "hidden";  // prevent scrolling
+document.getElementById("map").style.height = "100vh";
+document.getElementById("map").style.width = "100vw";
 
     map.resize(); 
   } else {
