@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Seville: Self-Guided Tapas Tour</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    .mapboxgl-popup-content {
+      background-color: rgba(255, 255, 255, 1) !important;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: sans-serif;
+      max-width: 220px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    }
+    .custom-popup strong {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .custom-popup p {
+      font-size: 0.85em;
+      font-style: italic;
+      margin: 0 0 6px;
+    }
+    .custom-popup .directions-btn,
+    .custom-popup .mark-visited-btn {
+      all: unset;
+      background-color: #ea640b;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.85em;
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      max-height: 26px;
+      gap: 5px;
+      text-decoration: none;
+    }
+    .custom-popup .directions-btn:hover {
+      background-color: #a34b10;
+    }
+    #search-container {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      width: 90%;
+      max-width: 400px;
+    }
+    #search {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    #suggestions {
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 200px;
+      overflow-y: auto;
+      position: absolute;
+      width: 100%;
+      z-index: 2;
+    }
+    .suggestion {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .suggestion:hover {
+      background: #f0f0f0;
+    }
+    .no-results {
+      padding: 8px 12px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<div id="search-container">
+  <input type="text" id="search" placeholder="Find your next stop..." />
+  <div id="suggestions"></div>
+</div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/sightseekr/cmh0zwh7100bk01sadvlz9u38',
+    center: [-5.995508, 37.383727], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+    zoom: 14.6
+  });
+
+  map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+  map.addControl(new mapboxgl.GeolocateControl({
+    positionOptions: { enableHighAccuracy: true },
+    trackUserLocation: true,
+    showUserHeading: true
+}), 'bottom-right');
+
+ const savedPoints = [
+      {
+        name: "Catedral de Sevilla",
+        description: "Your starting and ending point of the tapas tour - the beautiful Cathedral of Seville!",
+        coordinates: [37.38582, -5.99237]
+      },
+      {
+        name: "Stop 1: Pura Vida Terraza",
+        description: "Perfect for a cocktail with a stunning view of the cathedral. They don’t serve food - this is just the perfect place to relax with a drink and get your appetite ready for all the delicious dishes you’re about to try.",
+        coordinates: [37.3874, -5.99164]
+      },
+      {
+        name: "Stop 2: Bar Casa Morales",
+        description: "A very authentic, family-owned Spanish tapas bar. They offer tapas, full plates, and sharing options for the table.",
+        coordinates: [37.38647, -5.9946]
+      },
+      {
+        name: "Stop 3: Bodeguita Antonio Romero",
+        description: "This place is very local, but they welcome tourists! Incredible small plates of tapas, and generous pours of wine!",
+        coordinates: [37.38621, -5.99665]
+      },
+      {
+        name: "Stop 4: Mercado de Triana",
+        description: "An indoor market offering fresh food, cooked dishes, small bars with local drinks like orange wine, and even a museum!",
+        coordinates: [37.38571, -6.00361]
+      },
+      {
+        name: "Stop 5: Bar Casa de la Moneda",
+        description: "A great find, in a central location. It has a huge selection of traditional dishes as well as some more modern tapas options. They have a lot of indoor and outdoor seating, and serve food all day.",
+        coordinates: [37.38354, -5.99421]
+      },
+      {
+        name: "Stop 6: Restaurante Donaire Azabache",
+        description: "This restaurant is absolutely gorgeous. It’s in a stunning location, with a wide selection of typical Andalusian dishes. Definitely not to be missed, no matter how full you already are!!",
+        coordinates: [37.38417, -5.99313]
+      }
+    ];
+
+const directionsLinks = {
+  "Catedral de Sevilla": "https://maps.google.com/?cid=16473499337161076197",
+  "Stop 1: Pura Vida Terrazza": "https://maps.google.com/?cid=11782794435228907990",
+  "Stop 2: Bar Casa Morales": "https://maps.google.com/?cid=11782794435228907990",
+  "Stop 3: Bodeguita Antonio Romero": "https://maps.app.goo.gl/xFWzXE8DecPRXmcM8",
+  "Stop 4: Mercado de Triana": "https://maps.google.com/?cid=17389346938850283706",
+  "Stop 5: Bar Casa de la Moneda": "https://maps.google.com/?cid=2772950680227238778",
+  "Stop 6: Restaurante Donaire Azabache": "https://maps.google.com/?cid=12361450860120976953"
+  };
+
+  const fuse = new Fuse(savedPoints, {
+    keys: ['name'],
+    threshold: 0.4,
+    ignoreLocation: true,
+    includeScore: true
+  });
+
+  const searchInput = document.getElementById('search');
+  const suggestionsDiv = document.getElementById('suggestions');
+  let currentPopup = null;
+  let allFeatures = [];
+  let popupOpenedByClick = false
+  let popupHovering = false;
+
+
+  // Keep track of visited pubs, saved in localStorage
+let visitedPubs = JSON.parse(localStorage.getItem("visitedPubs")) || [];
+
+// Save back to localStorage whenever we update
+function saveVisitedPubs() {
+  localStorage.setItem("visitedPubs", JSON.stringify(visitedPubs));
+}
+
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+function createPopup(feature, lngLat, clicked = false) {
+  // remove any existing popup
+  if (currentPopup) {
+    currentPopup.remove();
+    currentPopup = null;
+  }
+
+  // set whether this popup is "locked" by a click
+  popupOpenedByClick = clicked;
+  // reset hover flag
+  popupHovering = false;
+
+  const name = feature.properties?.name || feature.properties?.Name || feature.properties?.title || "No title";
+  const isVisited = visitedPubs.includes(name);
+  const description = feature.properties?.description || feature.properties?.Description || "No description";
+  const directions = directionsLinks[name] || `https://www.google.com/maps/search/${encodeURIComponent(name)}`;
+
+  currentPopup = new mapboxgl.Popup({ closeButton: false })
+    .setLngLat(lngLat)
+    .setHTML(`
+      <div class="custom-popup">
+        <strong>${name}</strong>
+        <p>${description}</p>
+        <a href="${directions}" class="directions-btn" target="_blank">
+          <span>📍</span> <span>Directions</span>
+        </a>
+        <button class="directions-btn mark-visited-btn" data-pub="${name}">
+          ${isVisited ? "✅ Visited" : "✅ Mark as Visited"}
+        </button>
+      </div>
+    `)
+    .addTo(map);
+
+  // Mark-as-Visited button handler (safe check)
+  const markBtn = document.querySelector(".mark-visited-btn");
+  if (markBtn) {
+    markBtn.addEventListener("click", () => {
+      if (!visitedPubs.includes(name)) {
+        visitedPubs.push(name);
+        saveVisitedPubs();
+      }
+      markBtn.innerText = "✅ Visited";
+
+     const currentIndex = savedPoints.findIndex(p => p.name === name);
+const nextPub = savedPoints[currentIndex + 1];
+
+if (nextPub) {
+  // Move to next stop
+  searchAndZoomToFeature(nextPub.name);
+} else {
+  // No more stops – tour is complete
+  alert("🎉 You've completed our Tapas Tour! Now head back to the Cathedral to finish your journey.");
+  // Fly back to the cathedral
+  const cathedral = savedPoints[0]; // first item is cathedral
+  map.flyTo({ center: cathedral.coordinates.slice().reverse(), zoom: 17 });
+  setTimeout(() => {
+    searchAndZoomToFeature(cathedral.name);
+  }, 500);
+}   
+    });
+  }
+
+
+  // Popup DOM hover handlers — keep popup open while mouse is over it
+  const popupEl = document.querySelector(".mapboxgl-popup");
+  if (popupEl) {
+    popupEl.addEventListener("mouseenter", () => {
+      popupHovering = true;
+    });
+    popupEl.addEventListener("mouseleave", () => {
+      popupHovering = false;
+      // close only if not locked by click
+      if (!popupOpenedByClick && currentPopup) {
+        currentPopup.remove();
+        currentPopup = null;
+      }
+    });
+  }
+}
+
+  function searchAndZoomToFeature(name) {
+    for (let feature of allFeatures) {
+      const featureName = feature.properties?.name || feature.properties?.Name || feature.properties?.title;
+      if (featureName && featureName.toLowerCase().includes(name.toLowerCase())) {
+        const coords = feature.geometry.coordinates;
+        map.flyTo({ center: coords, zoom: 17 });
+        setTimeout(() => createPopup(feature, coords, true), 300);
+        return;
+      }
+    }
+
+    const allRenderedFeatures = map.queryRenderedFeatures();
+    for (let feature of allRenderedFeatures) {
+      const featureName = feature.properties?.name || feature.properties?.Name || feature.properties?.title;
+      if (featureName && featureName.toLowerCase().includes(name.toLowerCase())) {
+        const coords = feature.geometry.coordinates;
+        map.flyTo({ center: coords, zoom: 17 });
+        setTimeout(() => createPopup(feature, coords, true), 300);
+        return;
+      }
+    }
+
+    const matchingPoint = savedPoints.find(point => 
+      point.name.toLowerCase().includes(name.toLowerCase())
+    );
+    if (matchingPoint) {
+      const layer = ['newsevilletapas-8rawhb'];
+     map.fitBounds([
+        [-6.00561, 37.38154],  // Southwest corner (minLng - buffer, minLat - buffer)
+        [-5.98964, 37.38940]   // Northeast corner (maxLng + buffer, maxLat + buffer)
+        ], { padding: 50 });
+      setTimeout(() => {
+        const features = map.queryRenderedFeatures({ layers: layer });
+        const foundFeature = features.find(f =>
+          (f.properties?.name || f.properties?.Name || f.properties?.title)?.toLowerCase().includes(name.toLowerCase())
+        );
+        if (foundFeature) {
+          const coords = foundFeature.geometry.coordinates;
+          map.flyTo({ center: coords, zoom: 17 });
+          setTimeout(() => createPopup(foundFeature, coords, true), 300);
+        } else {
+          alert(`Sorry, "${name}" was not found on the map. It may be outside the current data area or spelled differently.`);
+        }
+      }, 1000);
+      return;
+    }
+
+    alert(`"${name}" was not found. Please check the spelling or try a different search term.`);
+  }
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+    suggestionsDiv.innerHTML = '';
+    if (!query) {
+      savedPoints.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.textContent = item.name;
+        div.onclick = () => {
+          searchInput.value = item.name;
+          suggestionsDiv.innerHTML = '';
+          searchAndZoomToFeature(item.name);
+        };
+        suggestionsDiv.appendChild(div);
+      });
+      return;
+    }
+    const results = fuse.search(query);
+    if (results.length) {
+      results.forEach(({ item }) => {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.textContent = item.name;
+        div.onclick = () => {
+          searchInput.value = item.name;
+          suggestionsDiv.innerHTML = '';
+          searchAndZoomToFeature(item.name);
+        };
+        suggestionsDiv.appendChild(div);
+      });
+    } else {
+      const div = document.createElement('div');
+      div.className = 'no-results';
+      div.textContent = "Can't find what you're looking for? It must not be a stop on our tapas tour! Why not take a look on your Ultimate Map instead?";
+      suggestionsDiv.appendChild(div);
+    }
+  });
+
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const query = searchInput.value.trim();
+      const result = fuse.search(query)[0];
+      if (result) {
+        searchAndZoomToFeature(result.item.name);
+        suggestionsDiv.innerHTML = '';
+      }
+    }
+  });
+
+  searchInput.addEventListener('focus', () => searchInput.dispatchEvent(new Event('input')));
+
+  document.addEventListener('click', function (event) {
+    const isClickInside = searchInput.contains(event.target) || suggestionsDiv.contains(event.target);
+    if (!isClickInside) {
+      suggestionsDiv.innerHTML = '';
+    }
+  });
+
+  map.on('load', () => {
+    const popupLayers = ['newsevilletapas-8rawhb'];
+    const nonpopupLayers = ['route-1-1-ci9ak6', 'tapasstartpoint-accblf'];
+    const layerToSourceLayer = {
+      'newsevilletapas-8rawhb': 'newsevilletapas-8rawhb',
+      'route-1-1-ci9ak6': 'route_1_1-ci9ak6',
+      'tapasstartpoint-accblf': 'tapasstartpoint-accblf'
+    };
+    const sourceId = 'composite';
+
+    function loadAllFeatures() {
+      popupLayers.forEach(layer => {
+        const sourceLayer = layerToSourceLayer[layer];
+        try {
+          const sourceFeatures = map.querySourceFeatures(sourceId, {
+            sourceLayer: sourceLayer
+          });
+          sourceFeatures.forEach(feature => {
+            const isDuplicate = allFeatures.some(existing => 
+              existing.properties && feature.properties &&
+              existing.properties.name === feature.properties.name
+            );
+            if (!isDuplicate && feature.properties && feature.properties.name) {
+              allFeatures.push(feature);
+            }
+          });
+        } catch (error) {
+          const renderedFeatures = map.queryRenderedFeatures({ layers: [layer] });
+          renderedFeatures.forEach(feature => {
+            const isDuplicate = allFeatures.some(existing => 
+              existing.properties && feature.properties &&
+              existing.properties.name === feature.properties.name
+            );
+            if (!isDuplicate && feature.properties && feature.properties.name) {
+              allFeatures.push(feature);
+            }
+          });
+        }
+      });
+    }
+
+    map.on('data', (e) => {
+      if (e.dataType === 'source' && e.sourceId === sourceId) {
+        allFeatures = [];
+        loadAllFeatures();
+      }
+    });
+
+    map.once('idle', () => {
+      if (allFeatures.length === 0) {
+        loadAllFeatures();
+      }
+    });
+
+if (!isMobile()) {
+  popupLayers.forEach(layer => {
+    // Hover: show popup (not locked)
+    map.on('mouseenter', layer, e => {
+      map.getCanvas().style.cursor = 'pointer';
+      createPopup(e.features[0], e.lngLat, false);
+    });
+
+    // When leaving the marker: wait a short tick and only close if
+    // not hovering the popup and not clicked (locked)
+    map.on('mouseleave', layer, () => {
+      map.getCanvas().style.cursor = '';
+      setTimeout(() => {
+        if (!popupOpenedByClick && !popupHovering && currentPopup) {
+          currentPopup.remove();
+          currentPopup = null;
+        }
+      }, 40); // tiny delay to allow mouse to enter popup
+    });
+
+    // Click on marker: open popup and lock it (until clicking map background)
+    map.on('click', layer, e => {
+      if (currentPopup) currentPopup.remove();
+      createPopup(e.features[0], e.lngLat, true);
+    });
+  });
+}else {
+    // Mobile: only click to open popup (no hover)
+    popupLayers.forEach(layer => {
+        map.on('click', layer, e => {
+        if (currentPopup) currentPopup.remove();
+        createPopup(e.features[0], e.lngLat, true);
+        });
+    });
+}
+    // Click on map background: close any open popup
+    map.on('click', (e) => {
+      const features = map.queryRenderedFeatures(e.point, { layers: layers });
+      if (features.length === 0 && currentPopup) {
+        currentPopup.remove();
+        currentPopup = null;
+        popupOpenedByClick = false;
+      }
+    });
+  });
+</script>
+</body>
+</html> 
