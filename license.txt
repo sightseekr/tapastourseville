@@ -1,0 +1,75 @@
+All Rights Reserved License
+Copyright © 2025 Sightseekr
+ All Rights Reserved.
+This work, including but not limited to code, maps, geographic data, routes, proprietary logic, user interfaces, branding, written content, imagery, travel toolkit content, and concepts, is the sole property of Sightseekr.
+No use of anything in this repository, for personal or commercial use, is permitted without an active paid license, travel toolkit purchase, or explicit written approval from Sightseekr.
+1. Licensing Requirement (No Free Use, Any Purpose)
+Use, access, display, or interaction with this work, whether for personal, educational, nonprofit, commercial, or experimental use, is strictly prohibited unless a paid license or travel toolkit has been purchased through: www.sightseekr.co.uk or via official Sightseekr partners.
+Unauthorized access or usage constitutes a breach of this license and violation of UK and international copyright law.
+2. Prohibited Activities
+Without explicit paid licensing and written permission, the following are strictly forbidden:
+Any use (personal, commercial, nonprofit, educational, or experimental)
+
+
+Copying, embedding, mirroring, framing, screenshots, or storage
+
+
+Redistribution, resale, or sharing with third parties
+
+
+Scraping, crawling, harvesting, or automated data extraction
+
+
+Use in AI training, machine learning models, vector embeddings, data enrichment, synthetic generation, or dataset creation
+
+
+Creation of derivative works or competitive products
+
+
+Use in research, academic papers, or public demonstrations
+
+
+All rights are strictly reserved.
+3. AI, Scraping, and Data Protection
+Use of any part of this content for artificial intelligence, algorithm training, recommendation engines, data indexing, or knowledge graph extraction is explicitly and permanently prohibited, regardless of whether the AI system is private, commercial, open source, nonprofit, or governmental.
+Attempted ingestion, tokenization, or embedding of this content into any AI system or dataset constitutes unauthorized access and intellectual property theft.
+4. Tracking, Monitoring, and Audit Rights
+To enforce protection of this intellectual property, Sightseekr reserves the following rights:
+4.1 Monitoring Rights
+Sightseekr may track, monitor, log, or technically fingerprint user access, including IP addresses, usage behavior, browser metadata, and device identifiers to detect unauthorized use.
+4.2 Audit Rights
+If unauthorized use or suspected breach is identified, you agree that Sightseekr has the right to:
+Demand immediate proof of deletion of all copies, backups, caches, or derivatives
+
+
+Request written certification under penalty of perjury that all content has been permanently removed
+
+
+Investigate usage including through third-party hosting providers, platforms, or repositories
+
+
+4.3 Retroactive Liability
+Any use prior to detection does not grant rights. Unauthorized use remains illegal regardless of timing. Users found in breach will be liable for damages, licensing fees, and legal costs.
+5. Termination & Damages
+Any unauthorized use immediately terminates all access rights without notice.
+ Sightseekr reserves the right to pursue:
+Injunctions
+
+
+Financial damages (including loss of revenue, statutory damages, penalties, and damages calculated based on commercial exploitation, not just actual use)
+
+
+Recovery of all legal and investigative costs
+
+
+Permanent bans on access or licensing
+
+
+6. Governing Law & Jurisdiction
+This license is governed exclusively by the laws of England and Wales.
+ All disputes shall be resolved in the courts of England and Wales.
+7. No Warranty
+This content is provided “as is,” without any warranty. Sightseekr is not liable for any outcomes resulting from access or attempts to use this content.
+8. Contact for Licensing & Permissions
+ hello.sightseekr@gmail.com
+ www.sightseekr.co.uk
