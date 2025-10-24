@@ -141,15 +141,15 @@ button:hover {
     .custom-popup .directions-btn:hover {
       background-color: #a34b10;
     }
-   #search-container {
+#search-container {
   position: absolute;
-  top: 12px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9999;  /*  This makes it show ABOVE the map */
   width: 90%;
   max-width: 400px;
-  pointer-events: auto; /* ensure input can be tapped */
+  z-index: 2147483647 !important; /* Max z-index to ensure it is above Mapbox UI */
+  pointer-events: auto !important;
 }
     #search {
       width: 100%;
@@ -180,6 +180,10 @@ button:hover {
       color: #666;
       font-style: italic;
     }
+    .mapboxgl-canvas, .mapboxgl-control-container {
+  pointer-events: auto !important;
+  z-index: 1 !important;
+}
   </style>
 </head>
 <body>
