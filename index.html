@@ -146,7 +146,7 @@ button:hover {
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 999999;
+      z-index: 1;
       width: 90%;
       max-width: 400px;
     }
@@ -179,35 +179,6 @@ button:hover {
       color: #666;
       font-style: italic;
     }
-/* MOBILE-SPECIFIC ADJUSTMENTS */
-@media (max-width: 768px) {
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  #content, #map {
-    height: 100%;
-    width: 100%;
-    position: relative; /* relative positioning avoids collapse on mobile */
-  }
-
-  #search-container {
-    top: 10px;
-    width: 90%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10; /* ensure it appears on top of the map */
-  }
-
-  #search {
-    font-size: 0.95em;
-    padding: 6px 10px;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -233,8 +204,29 @@ button:hover {
 </div>
 </div>
 <script>
-  const CORRECT_PASSWORD = "abc"; // <-- change this to your chosen password
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
+  const CORRECT_PASSWORD = "coffee123"; // <-- change this to your chosen password
+
+function checkPassword(event) {
+  event.preventDefault();
+  const input = document.getElementById("password").value;
+  if (input === CORRECT_PASSWORD) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    // Reset body styles for full-screen map
+    document.body.style.display = "block";
+    document.body.style.background = "none";
+    document.body.style.height = "100vh";
+    document.body.style.overflow = "hidden";
+
+    map.resize(); 
+  } else {
+    document.getElementById("error").style.display = "block";
+  }
+}
+</script>
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
 
   const map = new mapboxgl.Map({
     container: 'map',
@@ -242,29 +234,6 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxc
     center: [-5.995508, 37.383727], // starting position [lng, lat]. Note that lat must be set between -90 and 90
     zoom: 13.6
   });
-function checkPassword(event) {
-  event.preventDefault();
-  const input = document.getElementById("password").value;
-  if (input === CORRECT_PASSWORD) {
-    // Hide login, show map
-    document.getElementById("login").style.display = "none";
-    document.getElementById("content").style.display = "block";
-
-    // Reset body styles for full-screen map (DO NOT change display)
-    document.body.style.background = "none";
-    document.body.style.height = "100vh";
-    document.body.style.overflow = "hidden";
-
-    // Force Mapbox to recalc container size after layout adjustments
-    setTimeout(() => {
-      map.resize();
-    }, 100);
-  } else {
-    document.getElementById("error").style.display = "block";
-  }
-}
-</script>
-<script>
 
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
   map.addControl(new mapboxgl.GeolocateControl({
@@ -634,3 +603,7 @@ if (!isMobile()) {
         popupOpenedByClick = false;
       }
     });
+  });
+</script>
+</body>
+</html> 
