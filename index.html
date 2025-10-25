@@ -429,7 +429,7 @@ if (nextPub) {
         [-5.98964, 37.38940]   // Northeast corner (maxLng + buffer, maxLat + buffer)
         ], { padding: 50 });
       setTimeout(() => {
-        const features = map.queryRenderedFeatures({ layers: layer });
+        const features = map.queryRenderedFeatures({ layers: popupLayer });
         const foundFeature = features.find(f =>
           (f.properties?.name || f.properties?.Name || f.properties?.title)?.toLowerCase().includes(name.toLowerCase())
         );
