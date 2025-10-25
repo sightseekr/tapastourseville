@@ -234,7 +234,14 @@ button:hover {
 </div>
 <script>
   const CORRECT_PASSWORD = "abc"; // <-- change this to your chosen password
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
 
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/sightseekr/cmh0zwh7100bk01sadvlz9u38',
+    center: [-5.995508, 37.383727], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+    zoom: 13.6
+  });
 function checkPassword(event) {
   event.preventDefault();
   const input = document.getElementById("password").value;
@@ -258,14 +265,6 @@ function checkPassword(event) {
 }
 </script>
 <script>
-  mapboxgl.accessToken = 'pk.eyJ1Ijoic2lnaHRzZWVrciIsImEiOiJjbWgxdmNsZ2owc3h2MDhxcGdiZno4c3ptIn0.ODNk5NVKUxNh0b9QoL5tqQ';
-
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/sightseekr/cmh0zwh7100bk01sadvlz9u38',
-    center: [-5.995508, 37.383727], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-    zoom: 13.6
-  });
 
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
   map.addControl(new mapboxgl.GeolocateControl({
